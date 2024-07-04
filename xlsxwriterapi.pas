@@ -12448,31 +12448,11 @@ procedure lxw_workbook_set_default_xf_indices(workbook: Plxw_workbook); cdecl;
 procedure workbook_unset_default_url_format(workbook: Plxw_workbook); cdecl;
   external bj name _PU + 'workbook_unset_default_url_format';
 
-function chart_font_new: lxw_chart_font; cdecl;
 procedure decodecell(const aCell: PUTF8Char; out aRow, aCol: DWord);
 procedure decodecols(const aCell: PUTF8Char; out aColBegin, aColEnd: DWord);
 procedure decoderange(const aRange: PUTF8Char; out arowBegin, acolBegin, aRowEnd, aColEnd: DWord);
-function table_column_new: lxw_table_column;
-function table_options_new: lxw_table_options;
 
 implementation
-
-function chart_font_new: lxw_chart_font;
-var
-  rFont: lxw_chart_font;
-begin
-  rFont.name := 'Calibri';
-  rFont.size := $B;
-  rFont.bold := $0;
-  rFont.italic := $0;
-  rFont.underline := $0;
-  rFont.rotation := $0;
-  rFont.color := $0;
-  rFont.pitch_family := $0;
-  rFont.charset := $0;
-  rFont.baseline := $0;
-  Result := rFont;
-end;
 
 procedure decodecell(const aCell: PUTF8Char; out aRow, aCol: DWord);
 begin
@@ -12494,36 +12474,6 @@ begin
   aColEnd   := lxw_name_to_col_2(aRange);
 end;
 
-function table_column_new: lxw_table_column;
-var
-  rCol: lxw_table_column;
-begin
-    rCol.header := nil;
-    rCol.formula := nil;
-    rCol.total_string := nil;
-    rCol.total_function := 0;
-    rCol.header_format := nil;
-    rCol.format := nil;
-    rCol.total_value := $0;
-  Result := rCol;
-end;
 
-function table_options_new: lxw_table_options;
-var
-  rOpt: lxw_table_options;
-begin
-    rOpt.name := nil;
-    rOpt.no_header_row := $0;
-    rOpt.no_autofilter := $0;
-    rOpt.no_banded_rows :=  $0;
-    rOpt.banded_columns := $0;
-    rOpt.first_column := $0;
-    rOpt.last_column := 0;
-    rOpt.style_type := $0;
-    rOpt.style_type_number := $0;
-    rOpt.total_row :=  $0;
-    rOpt.columns := nil;
-  Result := rOpt;
-end;
 
 end.
