@@ -8,10 +8,10 @@ interface
 
 const
   {$IF Defined(WIN32)}
-  bj = 'libxlsxwriter.dll';
+  bj = 'xlsxwriter.dll';
   _PU = '';
   {$ELSEIF Defined(WIN64)}
-  bj = 'libxlsxwriter.dll';
+  bj = 'xlsxwriter.dll';
   _PU = '';
   {$ELSE}
     {$MESSAGE Error 'Unsupported platform'}
@@ -67,9 +67,9 @@ const
   LXW_DEF_COL_WIDTH_PIXELS = 64;
   LXW_DEF_ROW_HEIGHT_PIXELS = 20;
   LXW_DEFINED_NAME_LENGTH = 128;
-  LXW_VERSION_CC = '1.1.7';
-  LXW_VERSION_ID_CC = 117;
-  LXW_SOVERSION = '6';
+  LXW_VERSION_CC = '1.1.9';
+  LXW_VERSION_ID_CC = 119;
+  LXW_SOVERSION = '7';
 
 type
   UInt8 = Byte;
@@ -157,6 +157,7 @@ type
   Plxw_data_validations = ^lxw_data_validations;
   Plxw_cond_format_list = ^lxw_cond_format_list;
   Plxw_image_props = ^lxw_image_props;
+  Plxw_embedded_image_props = ^lxw_embedded_image_props;
   Plxw_chart_props = ^lxw_chart_props;
   Plxw_comment_objs = ^lxw_comment_objs;
   Plxw_table_objs = ^lxw_table_objs;
@@ -286,34 +287,36 @@ type
     LXW_ERROR_NULL_PARAMETER_IGNORED = 12,
     (** Function parameter validation error. *)
     LXW_ERROR_PARAMETER_VALIDATION = 13,
+    (** Function string parameter is empty. *)
+    LXW_ERROR_PARAMETER_IS_EMPTY = 14,
     (** Worksheet name exceeds Excel's limit of 31 characters. *)
-    LXW_ERROR_SHEETNAME_LENGTH_EXCEEDED = 14,
+    LXW_ERROR_SHEETNAME_LENGTH_EXCEEDED = 15,
     (** Worksheet name cannot contain invalid characters: '[ ] : * ? / \\' *)
-    LXW_ERROR_INVALID_SHEETNAME_CHARACTER = 15,
+    LXW_ERROR_INVALID_SHEETNAME_CHARACTER = 16,
     (** Worksheet name cannot start or end with an apostrophe. *)
-    LXW_ERROR_SHEETNAME_START_END_APOSTROPHE = 16,
+    LXW_ERROR_SHEETNAME_START_END_APOSTROPHE = 17,
     (** Worksheet name is already in use. *)
-    LXW_ERROR_SHEETNAME_ALREADY_USED = 17,
+    LXW_ERROR_SHEETNAME_ALREADY_USED = 18,
     (** Parameter exceeds Excel's limit of 32 characters. *)
-    LXW_ERROR_32_STRING_LENGTH_EXCEEDED = 18,
+    LXW_ERROR_32_STRING_LENGTH_EXCEEDED = 19,
     (** Parameter exceeds Excel's limit of 128 characters. *)
-    LXW_ERROR_128_STRING_LENGTH_EXCEEDED = 19,
+    LXW_ERROR_128_STRING_LENGTH_EXCEEDED = 20,
     (** Parameter exceeds Excel's limit of 255 characters. *)
-    LXW_ERROR_255_STRING_LENGTH_EXCEEDED = 20,
+    LXW_ERROR_255_STRING_LENGTH_EXCEEDED = 21,
     (** String exceeds Excel's limit of 32,767 characters. *)
-    LXW_ERROR_MAX_STRING_LENGTH_EXCEEDED = 21,
+    LXW_ERROR_MAX_STRING_LENGTH_EXCEEDED = 22,
     (** Error finding internal string index. *)
-    LXW_ERROR_SHARED_STRING_INDEX_NOT_FOUND = 22,
+    LXW_ERROR_SHARED_STRING_INDEX_NOT_FOUND = 23,
     (** Worksheet row or column index out of range. *)
-    LXW_ERROR_WORKSHEET_INDEX_OUT_OF_RANGE = 23,
+    LXW_ERROR_WORKSHEET_INDEX_OUT_OF_RANGE = 24,
     (** Maximum hyperlink length (2079) exceeded. *)
-    LXW_ERROR_WORKSHEET_MAX_URL_LENGTH_EXCEEDED = 24,
+    LXW_ERROR_WORKSHEET_MAX_URL_LENGTH_EXCEEDED = 25,
     (** Maximum number of worksheet URLs (65530) exceeded. *)
-    LXW_ERROR_WORKSHEET_MAX_NUMBER_URLS_EXCEEDED = 25,
+    LXW_ERROR_WORKSHEET_MAX_NUMBER_URLS_EXCEEDED = 26,
     (** Couldn't read image dimensions or DPI. *)
-    LXW_ERROR_IMAGE_DIMENSIONS = 26,
+    LXW_ERROR_IMAGE_DIMENSIONS = 27,
     (** Couldn't read image dimensions or DPI. *)
-    LXW_MAX_ERRNO = 27);
+    LXW_MAX_ERRNO = 28);
   Plxw_error = ^lxw_error;
 
   (** @brief Struct to represent a date and time in Excel.
@@ -2262,10 +2265,11 @@ type
     DYNAMIC_ARRAY_FORMULA_CELL = 7,
     BLANK_CELL = 8,
     BOOLEAN_CELL = 9,
-    COMMENT = 10,
-    HYPERLINK_URL = 11,
-    HYPERLINK_INTERNAL = 12,
-    HYPERLINK_EXTERNAL = 13);
+    ERROR_CELL = 10,
+    COMMENT = 11,
+    HYPERLINK_URL = 12,
+    HYPERLINK_INTERNAL = 13,
+    HYPERLINK_EXTERNAL = 14);
   Pcell_types = ^cell_types;
 
   pane_types = (
@@ -2327,6 +2331,11 @@ type
   end;
 
   lxw_image_props = record
+    stqh_first: Plxw_object_properties;
+    stqh_last: PPlxw_object_properties;
+  end;
+
+  lxw_embedded_image_props = record
     stqh_first: Plxw_object_properties;
     stqh_last: PPlxw_object_properties;
   end;
@@ -2502,7 +2511,7 @@ type
      *)
     value_formula: PUTF8Char;
     (**
-     * This parameter is used to set a list of strings for a drop down list.
+     * This parameter is used to set a list of strings for a dropdown list.
      * The list should be a `NULL` terminated array of char* strings:
      *
      * @code
@@ -3173,6 +3182,7 @@ type
     url: PUTF8Char;
     (** Add an optional mouseover tip for a hyperlink to the image. *)
     tip: PUTF8Char;
+    cell_format: Plxw_format;
   end;
 
   (**
@@ -3238,6 +3248,7 @@ type
     md5: PUTF8Char;
     image_position: PUTF8Char;
     decorative: UInt8;
+    format: Plxw_format;
     list_pointers: _anonymous_type_22;
   end;
 
@@ -3507,6 +3518,7 @@ type
     data_validations: Plxw_data_validations;
     conditional_formats: Plxw_cond_format_hash;
     image_props: Plxw_image_props;
+    embedded_image_props: Plxw_image_props;
     chart_data: Plxw_chart_props;
     drawing_rel_ids: Plxw_drawing_rel_ids;
     vml_drawing_rel_ids: Plxw_vml_drawing_rel_ids;
@@ -3572,7 +3584,7 @@ type
     zoom_scale_normal: UInt8;
     black_white: UInt8;
     num_validations: UInt8;
-    has_dynamic_arrays: UInt8;
+    has_dynamic_functions: UInt8;
     vba_codename: PUTF8Char;
     num_buttons: UInt16;
     tab_color: lxw_color_t;
@@ -3619,6 +3631,7 @@ type
     has_header_vml: UInt8;
     has_background_image: UInt8;
     has_buttons: UInt8;
+    storing_embedded_image: UInt8;
     external_vml_comment_link: Plxw_rel_tuple;
     external_comment_link: Plxw_rel_tuple;
     external_vml_header_link: Plxw_rel_tuple;
@@ -3985,6 +3998,7 @@ type
     worksheet_names: Plxw_worksheet_names;
     chartsheet_names: Plxw_chartsheet_names;
     image_md5s: Plxw_image_md5s;
+    embedded_image_md5s: Plxw_image_md5s;
     header_image_md5s: Plxw_image_md5s;
     background_md5s: Plxw_image_md5s;
     charts: Plxw_charts;
@@ -4006,6 +4020,7 @@ type
     num_format_count: UInt16;
     drawing_count: UInt16;
     comment_count: UInt16;
+    num_embedded_images: UInt32;
     font_count: UInt16;
     border_count: UInt16;
     fill_count: UInt16;
@@ -4019,6 +4034,9 @@ type
     has_vml: UInt8;
     has_comments: UInt8;
     has_metadata: UInt8;
+    has_embedded_images: UInt8;
+    has_dynamic_functions: UInt8;
+    has_embedded_image_descriptions: UInt8;
     used_xf_formats: Plxw_hash_table;
     used_dxf_formats: Plxw_hash_table;
     vba_project: PUTF8Char;
@@ -7651,7 +7669,7 @@ procedure lxw_styles_write_rich_font(styles: Plxw_styles; format: Plxw_format); 
 function lxw_new_attribute_str(const key: PUTF8Char; const value: PUTF8Char): Pxml_attribute; cdecl;
   external bj name _PU + 'lxw_new_attribute_str';
 
-function lxw_new_attribute_int(const key: PUTF8Char; value: UInt64): Pxml_attribute; cdecl;
+function lxw_new_attribute_int(const key: PUTF8Char; value: Int32): Pxml_attribute; cdecl;
   external bj name _PU + 'lxw_new_attribute_int';
 
 function lxw_new_attribute_dbl(const key: PUTF8Char; value: Double): Pxml_attribute; cdecl;
@@ -7893,6 +7911,9 @@ function lxw_utf8_strlen(const str: PUTF8Char): NativeUInt; cdecl;
 procedure lxw_str_tolower(str: PUTF8Char); cdecl;
   external bj name _PU + 'lxw_str_tolower';
 
+function lxw_str_is_empty(const str: PUTF8Char): UInt8; cdecl;
+  external bj name _PU + 'lxw_str_is_empty';
+
 function lxw_tmpfile(const tmpdir: PUTF8Char): PPointer; cdecl;
   external bj name _PU + 'lxw_tmpfile';
 
@@ -7925,6 +7946,9 @@ procedure lxw_add_ms_package_relationship(self: Plxw_relationships; const atype:
 
 procedure lxw_add_worksheet_relationship(self: Plxw_relationships; const atype: PUTF8Char; const target: PUTF8Char; const target_mode: PUTF8Char); cdecl;
   external bj name _PU + 'lxw_add_worksheet_relationship';
+
+procedure lxw_add_rich_value_relationship(self: Plxw_relationships); cdecl;
+  external bj name _PU + 'lxw_add_rich_value_relationship';
 
 (**
  * @brief Write a number to a worksheet cell.
@@ -9105,9 +9129,18 @@ function worksheet_set_column_pixels_opt(worksheet: Plxw_worksheet; first_col: l
  * **Note**:
  * The scaling of a image may be affected if is crosses a row that has its
  * default height changed due to a font that is larger than the default font
- * size or that has text wrapping turned on. To avoid this you should
- * explicitly set the height of the row using `worksheet_set_row()` if it
- * crosses an inserted image. See @ref working_with_object_positioning.
+ * size or that has text wrapping turned on. To avoid this you should explicitly
+ * set the height of the row using `worksheet_set_row()` if it crosses an
+ * inserted image. See @ref working_with_object_positioning.
+ *
+ * **NOTE on SVG files**:
+ * Excel doesn't directly support SVG files in the same way as other image file
+ * formats. It allows SVG to be inserted into a worksheet but converts them to,
+ * and displays them as, PNG files. It stores the original SVG image in the file
+ * so the original format can be retrieved. This removes the file size and
+ * resolution advantage of using SVG files. As such SVG files are not supported
+ * by `libxlsxwriter` since a conversion to the PNG format would be required
+ * and that format is already supported.
  *
  * BMP images are only supported for backward compatibility. In general it is
  * best to avoid BMP images since they aren't compressed. If used, BMP images
@@ -9224,7 +9257,7 @@ function worksheet_insert_image_buffer(worksheet: Plxw_worksheet; row: lxw_row_t
  *
  * The `%worksheet_insert_image_buffer_opt()` function is like
  * `worksheet_insert_image_buffer()` function except that it takes an optional
- * #lxw_image_options struct  * #lxw_image_options struct with the following members/options:
+ * #lxw_image_options struct with the following members/options:
  *
  * - `x_offset`: Offset from the left of the cell in pixels.
  * - `y_offset`: Offset from the top of the cell in pixels.
@@ -9255,6 +9288,116 @@ function worksheet_insert_image_buffer(worksheet: Plxw_worksheet; row: lxw_row_t
  *)
 function worksheet_insert_image_buffer_opt(worksheet: Plxw_worksheet; row: lxw_row_t; col: lxw_col_t; const image_buffer: PByte; image_size: NativeUInt; options: Plxw_image_options): lxw_error; cdecl;
   external bj name _PU + 'worksheet_insert_image_buffer_opt';
+
+(**
+ * @brief Embed an image in a worksheet cell.
+ *
+ * @param worksheet Pointer to a lxw_worksheet instance to be updated.
+ * @param row       The zero indexed row number.
+ * @param col       The zero indexed column number.
+ * @param filename  The image filename, with path if required.
+ *
+ * @return A #lxw_error code.
+ *
+ * This function can be used to embed a image into a worksheet cell and have the
+ * image automatically scale to the width and height of the cell. The X/Y
+ * scaling of the image is preserved but the size of the image is adjusted to
+ * fit the largest possible width or height depending on the cell dimensions.
+ *
+ * This is the equivalent of Excel's menu option to insert an image using the
+ * option to "Place in Cell" which is only available in Excel 365 versions from
+ * 2023 onwards. For older versions of Excel a `#VALUE!` error is displayed.
+ *
+ * @dontinclude embed_images.c
+ * @skip Change
+ * @until B6
+ *
+ * @image html embed_image.png
+ *
+ * The `worksheet_embed_image_opt()` function takes additional optional
+ * parameters to add urls or format the cell background, see below.
+ *
+ *)
+function worksheet_embed_image(worksheet: Plxw_worksheet; row: lxw_row_t; col: lxw_col_t; const filename: PUTF8Char): lxw_error; cdecl;
+  external bj name _PU + 'worksheet_embed_image';
+
+(**
+ * @brief Embed an image in a worksheet cell, with options.
+ *
+ * @param worksheet Pointer to a lxw_worksheet instance to be updated.
+ * @param row       The zero indexed row number.
+ * @param col       The zero indexed column number.
+ * @param filename  The image filename, with path if required.
+ * @param options   Optional image parameters.
+ *
+ * @return A #lxw_error code.
+ *
+ * The `%worksheet_embed_image_opt()` function is like
+ * `worksheet_embed_image()` function except that it takes an optional
+ * #lxw_image_options struct with the following members/options:
+ *
+ * - `description`: Optional description or "Alt text" for the image.
+ * - `decorative`: Optional parameter to mark image as decorative.
+ * - `url`: Add an optional hyperlink to the image.
+ * - `cell_format`: Add a format for the cell behind the embedded image.
+ *
+ *)
+function worksheet_embed_image_opt(worksheet: Plxw_worksheet; row: lxw_row_t; col: lxw_col_t; const filename: PUTF8Char; options: Plxw_image_options): lxw_error; cdecl;
+  external bj name _PU + 'worksheet_embed_image_opt';
+
+(**
+ * @brief Embed an image in a worksheet cell, from a memory buffer.
+ *
+ * @param worksheet    Pointer to a lxw_worksheet instance to be updated.
+ * @param row          The zero indexed row number.
+ * @param col          The zero indexed column number.
+ * @param image_buffer Pointer to an array of bytes that holds the image data.
+ * @param image_size   The size of the array of bytes.
+ *
+ * @return A #lxw_error code.
+ *
+ * This function can be used to embed a image into a worksheet from a memory
+ * buffer:
+ *
+ * @dontinclude embed_image_buffer.c
+ * @skip Embed
+ * @until B3
+ *
+ * @image html embed_image_buffer.png
+ *
+ * The buffer should be a pointer to an array of unsigned char data with a
+ * specified size.
+ *
+ * See `worksheet_embed_image()` for details about the supported image
+ * formats, and other image features.
+ *)
+function worksheet_embed_image_buffer(worksheet: Plxw_worksheet; row: lxw_row_t; col: lxw_col_t; const image_buffer: PByte; image_size: NativeUInt): lxw_error; cdecl;
+  external bj name _PU + 'worksheet_embed_image_buffer';
+
+(**
+ * @brief Embed an image in a worksheet cell, from a memory buffer.
+ *
+ * @param worksheet    Pointer to a lxw_worksheet instance to be updated.
+ * @param row          The zero indexed row number.
+ * @param col          The zero indexed column number.
+ * @param image_buffer Pointer to an array of bytes that holds the image data.
+ * @param image_size   The size of the array of bytes.
+ * @param options      Optional image parameters.
+ *
+ * @return A #lxw_error code.
+ *
+ * The `%worksheet_embed_image_buffer_opt()` function is like
+ * `worksheet_embed_image_buffer()` function except that it takes an optional
+ * #lxw_image_options struct with the following members/options:
+ *
+ * - `description`: Optional description or "Alt text" for the image.
+ * - `decorative`: Optional parameter to mark image as decorative.
+ * - `url`: Add an optional hyperlink to the image.
+ * - `cell_format`: Add a format for the cell behind the embedded image.
+ *
+ *)
+function worksheet_embed_image_buffer_opt(worksheet: Plxw_worksheet; row: lxw_row_t; col: lxw_col_t; const image_buffer: PByte; image_size: NativeUInt; options: Plxw_image_options): lxw_error; cdecl;
+  external bj name _PU + 'worksheet_embed_image_buffer_opt';
 
 (**
  * @brief Set the background image for a worksheet.
@@ -9463,7 +9606,7 @@ function worksheet_merge_range(worksheet: Plxw_worksheet; first_row: lxw_row_t; 
  * The `%worksheet_autofilter()` function allows an autofilter to be added to
  * a worksheet.
  *
- * An autofilter is a way of adding drop down lists to the headers of a 2D
+ * An autofilter is a way of adding dropdown lists to the headers of a 2D
  * range of worksheet data. This allows users to filter the data based on
  * simple criteria so that some data is shown and some is hidden.
  *
@@ -10033,7 +10176,7 @@ procedure worksheet_split_panes_opt(worksheet: Plxw_worksheet; vertical: Double;
  * @endcode
  *
  *)
-procedure worksheet_set_selection(worksheet: Plxw_worksheet; first_row: lxw_row_t; first_col: lxw_col_t; last_row: lxw_row_t; last_col: lxw_col_t); cdecl;
+function worksheet_set_selection(worksheet: Plxw_worksheet; first_row: lxw_row_t; first_col: lxw_col_t; last_row: lxw_row_t; last_col: lxw_col_t): lxw_error; cdecl;
   external bj name _PU + 'worksheet_set_selection';
 
 (**
@@ -11293,6 +11436,9 @@ procedure lxw_worksheet_write_page_setup(worksheet: Plxw_worksheet); cdecl;
 procedure lxw_worksheet_write_header_footer(worksheet: Plxw_worksheet); cdecl;
   external bj name _PU + 'lxw_worksheet_write_header_footer';
 
+procedure worksheet_set_error_cell(worksheet: Plxw_worksheet; object_props: Plxw_object_properties; ref_id: UInt32); cdecl;
+  external bj name _PU + 'worksheet_set_error_cell';
+
 (**
  * @brief Insert a chart object into a chartsheet.
  *
@@ -11844,6 +11990,7 @@ function workbook_new_opt(const filename: PUTF8Char; options: Plxw_workbook_opti
  *
  * The worksheet name must be a valid Excel worksheet name, i.e:
  *
+ * - The name cannot be blank.
  * - The name is less than or equal to 31 UTF-8 characters.
  * - The name doesn't contain any of the characters: ` [ ] : * ? / \ `
  * - The name doesn't start or end with an apostrophe.
@@ -11886,6 +12033,7 @@ function workbook_add_worksheet(workbook: Plxw_workbook; const sheetname: PUTF8C
  *
  * The chartsheet name must be a valid Excel worksheet name, i.e.:
  *
+ * - The name cannot be blank.
  * - The name is less than or equal to 31 UTF-8 characters.
  * - The name doesn't contain any of the characters: ` [ ] : * ? / \ `
  * - The name doesn't start or end with an apostrophe.
@@ -12301,6 +12449,7 @@ function workbook_get_chartsheet_by_name(workbook: Plxw_workbook; const name: PU
  * This function is used to validate a worksheet or chartsheet name according
  * to the rules used by Excel:
  *
+ * - The name cannot be blank.
  * - The name is less than or equal to 31 UTF-8 characters.
  * - The name doesn't contain any of the characters: ` [ ] : * ? / \ `
  * - The name doesn't start or end with an apostrophe.
@@ -12452,6 +12601,11 @@ procedure decodecell(const aCell: PUTF8Char; out aRow, aCol: DWord);
 procedure decodecols(const aCell: PUTF8Char; out aColBegin, aColEnd: DWord);
 procedure decoderange(const aRange: PUTF8Char; out arowBegin, acolBegin, aRowEnd, aColEnd: DWord);
 
+procedure chart_font_init(var aFont: lxw_chart_font);
+procedure table_column_init(var aCol: lxw_table_column);cdecl;
+procedure table_options_init(var aOpt: lxw_table_options);cdecl;
+procedure chart_data_label_init(var aLbl: lxw_chart_data_label);
+
 implementation
 
 procedure decodecell(const aCell: PUTF8Char; out aRow, aCol: DWord);
@@ -12474,6 +12628,59 @@ begin
   aColEnd   := lxw_name_to_col_2(aRange);
 end;
 
+procedure chart_font_init(var aFont: lxw_chart_font);
+begin
+{
+  aFont.name := 'Calibri';
+  aFont.size := $B;
+}
+  aFont.name := nil;
+  aFont.size := $0;
+  aFont.bold := $0;
+  aFont.italic := $0;
+  aFont.underline := $0;
+  aFont.rotation := $0;
+  aFont.color := $0;
+  aFont.pitch_family := $0;
+  aFont.charset := $0;
+  aFont.baseline := $0;
+end;
+
+procedure table_column_init(var aCol: lxw_table_column);
+begin
+    aCol.header := nil;
+    aCol.formula := nil;
+    aCol.total_string := nil;
+    aCol.total_function := 0;
+    aCol.header_format := nil;
+    aCol.format := nil;
+    aCol.total_value := $0;
+end;
+
+procedure table_options_init(var aOpt: lxw_table_options);
+begin
+  aOpt.name := nil;
+  aOpt.no_header_row := $0;
+  aOpt.no_autofilter := $0;
+  aOpt.no_banded_rows :=  $0;
+  aOpt.banded_columns := $0;
+  aOpt.first_column := $0;
+  aOpt.last_column := 0;
+  aOpt.style_type := $0;
+  aOpt.style_type_number := $0;
+  aOpt.total_row :=  $0;
+  aOpt.columns := nil;
+end;
+
+procedure chart_data_label_init(var aLbl: lxw_chart_data_label);
+begin
+  aLbl.value := nil;
+  aLbl.hide := $0;
+  aLbl.font := nil;
+  aLbl.line := nil;
+  aLbl.fill := nil;
+  aLbl.pattern := nil;
+end;
 
 
 end.
