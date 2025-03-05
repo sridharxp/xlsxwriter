@@ -67,9 +67,9 @@ const
   LXW_DEF_COL_WIDTH_PIXELS = 64;
   LXW_DEF_ROW_HEIGHT_PIXELS = 20;
   LXW_DEFINED_NAME_LENGTH = 128;
-  LXW_VERSION_CC = '1.1.9';
-  LXW_VERSION_ID_CC = 119;
-  LXW_SOVERSION = '7';
+  LXW_VERSION_CC = '1.2.1';
+  LXW_VERSION_ID_CC = 121;
+  LXW_SOVERSION = '8';
 
 type
   UInt8 = Byte;
@@ -376,10 +376,10 @@ type
   P_anonymous_type_2 = ^_anonymous_type_2;
   _anonymous_type_2 = record
     case Integer of
-      0: (str_: PUTF8Char);
+      0: (_str: PUTF8Char);
       1: (number: Double);
-      2: (int__: Int32);
-      3: (bool_: UInt8);
+      2: (_int: Int32);
+      3: (_bool: UInt8);
       4: (datetime: lxw_datetime);
   end;
 
@@ -389,7 +389,7 @@ type
   end;
 
   lxw_custom_property = record
-    type_: lxw_custom_property_types;
+    _type: lxw_custom_property_types;
     name: PUTF8Char;
     u: _anonymous_type_2;
     list_pointers: _anonymous_type_3;
@@ -419,14 +419,14 @@ type
 
   sst_element = record
     index: UInt32;
-    str: PUTF8Char;
+    _str: PUTF8Char;
     is_rich_string: UInt8;
     sst_order_pointers: _anonymous_type_4;
     sst_tree_pointers: _anonymous_type_5;
   end;
 
   lxw_sst = record
-    file_: PPointer;
+    _file: PPointer;
     string_count: UInt32;
     unique_count: UInt32;
     order_list: Psst_order_list;
@@ -681,7 +681,7 @@ type
    *
    *)
   lxw_format = record
-    file_: PPointer;
+    _file: PPointer;
     xf_format_indices: Plxw_hash_table;
     dxf_format_indices: Plxw_hash_table;
     num_xf_formats: PUInt16;
@@ -1212,7 +1212,7 @@ type
   lxw_series_data_point = record
     is_string: UInt8;
     number: Double;
-    str: PUTF8Char;
+    _str: PUTF8Char;
     no_data: UInt8;
     list_pointers: _anonymous_type_9;
   end;
@@ -1260,7 +1260,7 @@ type
     (** The pattern background color. See @ref working_with_colors. *)
     bg_color: lxw_color_t;
     (** The pattern type. See #lxw_chart_pattern_type. *)
-    type_: UInt8;
+    _type: UInt8;
   end;
 
   (**
@@ -1298,7 +1298,7 @@ type
   end;
 
   lxw_chart_marker = record
-    type_: UInt8;
+    _type: UInt8;
     size: UInt8;
     line: Plxw_chart_line;
     fill: Plxw_chart_fill;
@@ -1437,7 +1437,7 @@ type
   Plxw_chart_error_bar_cap = ^lxw_chart_error_bar_cap;
 
   lxw_series_error_bars = record
-    type_: UInt8;
+    _type: UInt8;
     direction: UInt8;
     endcap: UInt8;
     has_value: UInt8;
@@ -1595,8 +1595,8 @@ type
    * the chart properties are set by calling the functions shown in chart.h.
    *)
   lxw_chart = record
-    file_: PPointer;
-    type_: UInt8;
+    _file: PPointer;
+    _type: UInt8;
     subtype: UInt8;
     series_index: UInt16;
     write_chart_type: procedure(p1: Plxw_chart); cdecl;
@@ -1701,10 +1701,10 @@ type
   end;
 
   lxw_drawing_object = record
-    type_: UInt8;
+    _type: UInt8;
     anchor: UInt8;
     from: lxw_drawing_coords;
-    to_: lxw_drawing_coords;
+    _to: lxw_drawing_coords;
     col_absolute: UInt64;
     row_absolute: UInt64;
     width: UInt32;
@@ -1719,14 +1719,14 @@ type
   end;
 
   lxw_drawing = record
-    file_: PPointer;
+    _file: PPointer;
     embedded: UInt8;
     orientation: UInt8;
     drawing_objects: Plxw_drawing_objects;
   end;
 
   lxw_styles = record
-    file_: PPointer;
+    _file: PPointer;
     font_count: UInt32;
     xf_count: UInt32;
     dxf_count: UInt32;
@@ -1767,14 +1767,14 @@ type
   end;
 
   lxw_rel_tuple = record
-    type_: PUTF8Char;
+    _type: PUTF8Char;
     target: PUTF8Char;
     target_mode: PUTF8Char;
     list_pointers: _anonymous_type_15;
   end;
 
   lxw_relationships = record
-    file_: PPointer;
+    _file: PPointer;
     rel_id: UInt32;
     relationships: Plxw_rel_tuples;
   end;
@@ -2432,7 +2432,7 @@ type
   end;
 
   lxw_panes = record
-    type_: UInt8;
+    _type: UInt8;
     first_row: lxw_row_t;
     first_col: lxw_col_t;
     top_row: lxw_row_t;
@@ -2641,7 +2641,7 @@ type
     (** The type of conditional format such as #LXW_CONDITIONAL_TYPE_CELL or
      *  #LXW_CONDITIONAL_DATA_BAR. Should be a #lxw_conditional_format_types
      *  value.*)
-    type_: UInt8;
+    _type: UInt8;
     (** The criteria parameter is used to set the criteria by which the cell
      *  data will be evaluated. For example in the expression `a > 5 the
      *  criteria is `>` or, in libxlsxwriter terms,
@@ -2803,7 +2803,7 @@ type
   end;
 
   lxw_cond_format_obj = record
-    type_: UInt8;
+    _type: UInt8;
     criteria: UInt8;
     min_value: Double;
     min_value_string: PUTF8Char;
@@ -3135,7 +3135,7 @@ type
   end;
 
   lxw_filter_rule_obj = record
-    type_: UInt8;
+    _type: UInt8;
     is_custom: UInt8;
     has_blanks: UInt8;
     col_num: lxw_col_t;
@@ -3377,7 +3377,7 @@ type
     rel_index: UInt32;
     font_size: Double;
     from: lxw_drawing_coords;
-    to_: lxw_drawing_coords;
+    _to: lxw_drawing_coords;
     author: PUTF8Char;
     font_name: PUTF8Char;
     text: PUTF8Char;
@@ -3489,7 +3489,7 @@ type
      *  isn't formatted. *)
     format: Plxw_format;
     (** The string fragment. *)
-    str_: PUTF8Char;
+    _str: PUTF8Char;
   end;
 
   P_anonymous_type_24 = ^_anonymous_type_24;
@@ -3505,14 +3505,14 @@ type
    * worksheet.h.
    *)
   lxw_worksheet = record
-    file_: PPointer;
+    _file: PPointer;
     optimize_tmpfile: PPointer;
     optimize_buffer: PUTF8Char;
     optimize_buffer_size: NativeUInt;
     table: Plxw_table_rows;
     hyperlinks: Plxw_table_rows;
     comments: Plxw_table_rows;
-    array_: PPlxw_cell;
+    _array: PPlxw_cell;
     merged_ranges: Plxw_merged_ranges;
     selections: Plxw_selections;
     data_validations: Plxw_data_validations;
@@ -3709,7 +3709,7 @@ type
     case Integer of
       0: (number: Double);
       1: (string_id: Int32);
-      2: (str_: PUTF8Char);
+      2: (_str: PUTF8Char);
   end;
 
   P_anonymous_type_27 = ^_anonymous_type_27;
@@ -3723,7 +3723,7 @@ type
   lxw_cell = record
     row_num: lxw_row_t;
     col_num: lxw_col_t;
-    type_: cell_types;
+    _type: cell_types;
     format: Plxw_format;
     comment: Plxw_vml_obj;
     u: _anonymous_type_26;
@@ -3761,7 +3761,7 @@ type
    * chartsheet.h.
    *)
   lxw_chartsheet = record
-    file_: PPointer;
+    _file: PPointer;
     worksheet: Plxw_worksheet;
     chart: Plxw_chart;
     protection: lxw_protection_obj;
@@ -3991,7 +3991,7 @@ type
    * workbook.h.
    *)
   lxw_workbook = record
-    file_: PPointer;
+    _file: PPointer;
     sheets: Plxw_sheets;
     worksheets: Plxw_worksheets;
     chartsheets: Plxw_chartsheets;
@@ -4021,6 +4021,8 @@ type
     drawing_count: UInt16;
     comment_count: UInt16;
     num_embedded_images: UInt32;
+    window_width: UInt16;
+    window_height: UInt16;
     font_count: UInt16;
     border_count: UInt16;
     fill_count: UInt16;
@@ -4253,6 +4255,40 @@ procedure format_set_font_strikeout(format: Plxw_format); cdecl;
  *)
 procedure format_set_font_script(format: Plxw_format; style: UInt8); cdecl;
   external bj name _PU + 'format_set_font_script';
+
+(**
+ * @brief Set the Format font family property.
+ *
+ * @param format Pointer to a Format instance.
+ * @param value  The font family index.
+ *
+ * Set the font family. This is usually an integer in the range 1-4. This
+ * function is implemented for completeness but is rarely used in practice.
+ *
+ * @code
+ *     format_set_font_family(format, 178);
+ * @endcode
+ *
+ *)
+procedure format_set_font_family(format: Plxw_format; value: UInt8); cdecl;
+  external bj name _PU + 'format_set_font_family';
+
+(**
+ * @brief Set the Format font character set property.
+ *
+ * @param format Pointer to a Format instance.
+ * @param value  The font character set.
+ *
+ * Set the font character set property. This function is implemented for
+ * completeness but is rarely used in practice.
+ *
+ * @code
+ *     format_set_font_charset(format, 178);
+ * @endcode
+ *
+ *)
+procedure format_set_font_charset(format: Plxw_format; value: UInt8); cdecl;
+  external bj name _PU + 'format_set_font_charset';
 
 (**
  * @brief Set the number format for a cell.
@@ -4922,11 +4958,7 @@ procedure format_set_font_outline(format: Plxw_format); cdecl;
 procedure format_set_font_shadow(format: Plxw_format); cdecl;
   external bj name _PU + 'format_set_font_shadow';
 
-procedure format_set_font_family(format: Plxw_format; value: UInt8); cdecl;
-  external bj name _PU + 'format_set_font_family';
 
-procedure format_set_font_charset(format: Plxw_format; value: UInt8); cdecl;
-  external bj name _PU + 'format_set_font_charset';
 
 procedure format_set_font_scheme(format: Plxw_format; const font_scheme: PUTF8Char); cdecl;
   external bj name _PU + 'format_set_font_scheme';
@@ -12585,6 +12617,8 @@ function workbook_set_vba_name(workbook: Plxw_workbook; const name: PUTF8Char): 
 procedure workbook_read_only_recommended(workbook: Plxw_workbook); cdecl;
   external bj name _PU + 'workbook_read_only_recommended';
 
+procedure workbook_set_size(workbook: Plxw_workbook; width: UInt16; height: UInt16); cdecl;
+  external bj name _PU + 'workbook_set_size';
 procedure lxw_workbook_free(workbook: Plxw_workbook); cdecl;
   external bj name _PU + 'lxw_workbook_free';
 
