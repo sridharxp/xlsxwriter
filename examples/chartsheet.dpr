@@ -18,7 +18,7 @@ const
 { Three columns of data. }
 procedure write_worksheet_data(worksheet: Plxw_worksheet; bold: Plxw_format);
 var
-  rrow, rcol: Word;
+  rrow, rcol: DWord;
 begin
   decodecell('A1', rrow, rcol);
     worksheet_write_string(worksheet, rrow, rcol, 'Number',  bold);

@@ -131,4 +131,8 @@ begin
 
 
   workbook_close(workbook);
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.

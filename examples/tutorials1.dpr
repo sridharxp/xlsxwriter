@@ -47,5 +47,9 @@ begin
   worksheet_write_formula(worksheet, row, col + 1, '=SUM(B1:B4)', nil);
 
   (* Save the workbook and free any allocated memory. *)
-  workbook_close(workbook);
+  lxw_error(ExitCode) := workbook_close(workbook);
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.

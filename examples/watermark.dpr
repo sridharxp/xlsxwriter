@@ -1,4 +1,4 @@
-program hello;
+program watermark;
 
 {$APPTYPE CONSOLE}
 
@@ -10,13 +10,18 @@ var
   workbook: Plxw_workbook;
   worksheet: Plxw_worksheet;
   ReportName: PAnsiChar;
+  header_options: lxw_header_footer_options;
 begin
-  ReportName := 'hello_world.xlsx';
+  ReportName := 'watermark.xlsx';
   workbook  := workbook_new(ReportName);
   worksheet := workbook_add_worksheet(workbook, nil);
-  worksheet_write_string(worksheet, 0, 0, 'Hello', nil);
-  worksheet_write_number(worksheet, 1, 0, 123, nil);
+
+  // Set a worksheet header with the watermark image.
+  header_options.image_center := 'watermark.png';
+  worksheet_set_header_opt(worksheet, '&C&[Picture]', @header_options);
+
   workbook_close(workbook);
+
   ExitCode := 0;
 {
   ShellExecute(Self.Handle, Pchar('Open'), ReportName,

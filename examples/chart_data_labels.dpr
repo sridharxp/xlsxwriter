@@ -416,4 +416,8 @@ begin
     worksheet_insert_chart_opt(worksheet, rRow, rCol, chart, @options);
 
   workbook_close(workbook);
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.

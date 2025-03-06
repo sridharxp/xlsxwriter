@@ -1,4 +1,4 @@
-program chartsheet;
+program chart_area;
 
 {$APPTYPE CONSOLE*}
 
@@ -19,7 +19,7 @@ const
 { Three columns of data. }
 procedure write_worksheet_data(worksheet: Plxw_worksheet; bold: Plxw_format);
 var
-  rrow, rcol: Word;
+  rrow, rcol: DWord;
 begin
   decodecell('A1', rrow, rcol);
     worksheet_write_string(worksheet, rrow, rcol, 'Number',  bold);
@@ -43,7 +43,7 @@ var
   series: Plxw_chart_series;
   bold: plxw_format;
   chart: Plxw_chart;
-  rRow1, rCol1: Word;
+  rRow1, rCol1: DWord;
   ReportName: pUTF8Char;
 begin
   ReportName := 'chart_area.xlsx';
@@ -150,5 +150,9 @@ begin
     worksheet_insert_chart(worksheet, rRow1, rCol1, chart);
 
     workbook_close(workbook);
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.
 

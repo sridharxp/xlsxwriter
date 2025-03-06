@@ -15,4 +15,9 @@ begin
   worksheet := workbook_add_worksheet(workbook, nil);
 
    worksheet_set_background(worksheet, 'logo.png');
+  workbook_close(workbook);
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.

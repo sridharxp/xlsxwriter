@@ -40,4 +40,10 @@ begin
     worksheet_write_array_formula(worksheet, 4, 0, 6, 0, '{=TREND(C5:C7,B5:B7)}', nil);
 
   workbook_close(workbook);
+
+  ExitCode := 0;
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.
