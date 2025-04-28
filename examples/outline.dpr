@@ -381,4 +381,9 @@ begin
 
     workbook_close(workbook);
 
+    ExitCode := 0;
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.

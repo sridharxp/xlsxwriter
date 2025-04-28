@@ -27,11 +27,11 @@ begin
   worksheet := workbook_add_worksheet(workbook, nil);
 
 
-    // Add a bold format to use to highlight the header cells.
+    (* Add a bold format to use to highlight the header cells. )
     bold := workbook_add_format(workbook);
     format_set_bold(bold);
 
-    // Write some data for the chart.
+    (* Write some data for the chart. *)
     worksheet_write_string(worksheet, 0, 0, 'Shingle', bold);
     worksheet_write_number(worksheet, 1, 0, 105,       nil);
     worksheet_write_number(worksheet, 2, 0, 150,       nil);
@@ -43,10 +43,10 @@ begin
     worksheet_write_number(worksheet, 3, 1, 100,       nil);
     worksheet_write_number(worksheet, 4, 1, 110,       nil);
 
-    // Create a chart object.
+    (* Create a chart object. )
     chart := workbook_add_chart(workbook, Byte(LXW_CHART_COLUMN));
 
-    // Configure the chart.
+    (* Configure the chart. *)
     series1 := chart_add_series(chart, nil, 'Sheet1!$A$2:$A$5');
     series2 := chart_add_series(chart, nil, 'Sheet1!$B$2:$B$5');
 
@@ -58,7 +58,7 @@ begin
     chart_axis_set_name(chart.y_axis, 'Number of houses');
 
 
-    // Configure an add the chart series patterns.
+    (* Configure an add the chart series patterns. )
     pattern1._type := Byte(LXW_CHART_PATTERN_SHINGLE);
                                   pattern1.fg_color := $804000;
                                   pattern1.bg_color := $C68C53;
@@ -70,14 +70,14 @@ begin
     chart_series_set_pattern(series1, @pattern1);
     chart_series_set_pattern(series2, @pattern2);
 
-    // Configure and set the chart series borders.
+    (* Configure and set the chart series borders. *)
     line1.color := $804000;
     line2.color := $b30000;
 
     chart_series_set_line(series1, @line1);
     chart_series_set_line(series2, @line2);
 
-    // Widen the gap between the series/categories.
+    (* Widen the gap between the series/categories. *)
     chart_set_series_gap(chart, 70);
 
     // Insert the chart into the worksheet.

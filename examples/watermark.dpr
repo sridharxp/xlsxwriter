@@ -16,7 +16,7 @@ begin
   workbook  := workbook_new(ReportName);
   worksheet := workbook_add_worksheet(workbook, nil);
 
-  // Set a worksheet header with the watermark image.
+  (* Set a worksheet header with the watermark image. )
   header_options.image_center := 'watermark.png';
   worksheet_set_header_opt(worksheet, '&C&[Picture]', @header_options);
 

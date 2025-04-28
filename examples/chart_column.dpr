@@ -156,5 +156,9 @@ begin
     worksheet_insert_chart(worksheet, rRow1, rCol1, chart);
 
 
-  workbook_close(workbook);
+  lxw_error(ExitCode) := workbook_close(workbook);
+{
+  ShellExecute(Self.Handle, Pchar('Open'), ReportName,
+      nil, nil, SW_SHOWNORMAL);
+}
 end.
